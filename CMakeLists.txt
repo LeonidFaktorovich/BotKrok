@@ -8,5 +8,5 @@ set(Boost_LIBRARY_DIR c:/mingw/lib/)
 find_package(Boost REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 
-add_executable(BotKrok main.cpp SocketSession.cpp SocketSession.h MsgProcess.cpp MsgProcess.h Bot.cpp Bot.h)
+add_executable(BotKrok main.cpp SocketSession.cpp SocketSession.h MsgProcess.cpp MsgProcess.h Bot.cpp Bot.h Algorithm.cpp Algorithm.h)
 add_executable(test test_server.cpp)

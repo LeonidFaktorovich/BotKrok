@@ -77,6 +77,13 @@ build CMakeFiles/BotKrok.dir/Bot.cpp.obj: CXX_COMPILER__BotKrok_Debug C$:/Users/
   OBJECT_DIR = CMakeFiles\BotKrok.dir
   OBJECT_FILE_DIR = CMakeFiles\BotKrok.dir
 
+build CMakeFiles/BotKrok.dir/Algorithm.cpp.obj: CXX_COMPILER__BotKrok_Debug C$:/Users/marya/BotKrok/Algorithm.cpp || cmake_object_order_depends_target_BotKrok
+  DEP_FILE = CMakeFiles\BotKrok.dir\Algorithm.cpp.obj.d
+  FLAGS = -g -std=gnu++20
+  INCLUDES = -IC:/Users/marya/Downloads/boost_1_79_0
+  OBJECT_DIR = CMakeFiles\BotKrok.dir
+  OBJECT_FILE_DIR = CMakeFiles\BotKrok.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target BotKrok
@@ -85,7 +92,7 @@ build CMakeFiles/BotKrok.dir/Bot.cpp.obj: CXX_COMPILER__BotKrok_Debug C$:/Users/
 #############################################
 # Link the executable BotKrok.exe
 
-build BotKrok.exe: CXX_EXECUTABLE_LINKER__BotKrok_Debug CMakeFiles/BotKrok.dir/main.cpp.obj CMakeFiles/BotKrok.dir/SocketSession.cpp.obj CMakeFiles/BotKrok.dir/MsgProcess.cpp.obj CMakeFiles/BotKrok.dir/Bot.cpp.obj
+build BotKrok.exe: CXX_EXECUTABLE_LINKER__BotKrok_Debug CMakeFiles/BotKrok.dir/main.cpp.obj CMakeFiles/BotKrok.dir/SocketSession.cpp.obj CMakeFiles/BotKrok.dir/MsgProcess.cpp.obj CMakeFiles/BotKrok.dir/Bot.cpp.obj CMakeFiles/BotKrok.dir/Algorithm.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\BotKrok.dir
