@@ -1,0 +1,4 @@
+/Users/leonidf/CLionProjects/BotKrok/cmake-build-debug/CMakeFiles/test.dir
+/Users/leonidf/CLionProjects/BotKrok/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/leonidf/CLionProjects/BotKrok/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/leonidf/CLionProjects/BotKrok/cmake-build-debug/CMakeFiles/BotKrok.dir
