@@ -37,19 +37,8 @@ struct game_parameters {
 class MsgProcess
 {
  public:
-    MsgProcess(std::string bot_name,
-               std::string bot_secret,
-               std::string match_mode);
-    std::string GetAnswer(const message_type &msg);
-    std::string HelloAnswer();
-    const game_parameters GetParameters() const;
-
- private:
-    std::string bot_name_;
-    std::string bot_secret_;
-    std::string match_mode_;
-    size_t protocol_version_;
-    game_parameters parameters_;
+    static std::string HelloAnswer(const std::string& bot_name, const std::string& bot_secret, const std::string& match_mode);
+    static void GetParameters(const message_type& msg, game_parameters& parameters);
 };
 
 #endif//BOTKROK__MSGPROCESS_H_

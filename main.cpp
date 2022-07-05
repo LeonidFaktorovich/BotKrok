@@ -2,8 +2,7 @@
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
 #include <string>
-#include "MsgProcess.h"
-#include "SocketSession.h"
+#include "Bot.h"
 
 using namespace boost::asio;
 using ip::tcp;
@@ -46,7 +45,7 @@ int main() {
             break;
         }
     }
-     */
+
     const char ip[] = "127.0.0.1";
     int port = 2021;
     SocketSession soc(ip, port);
@@ -57,6 +56,10 @@ int main() {
     auto answer = process.GetAnswer(msg);
     std::cout << answer << std::endl;
     soc.Write(answer);
-
+    */
+    Bot my_bot("Kaban", "_", "FRIENDLY");
+    const char ip[] = "127.0.0.1";
+    int port =2021;
+    my_bot.StartSession(ip, port);
     return 0;
 }
