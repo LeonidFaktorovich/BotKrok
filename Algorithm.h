@@ -77,6 +77,7 @@ class Algorithm
     Algorithm(const game_parameters &params);
     void Set(size_t x, size_t y, Square new_square);
     pair GetNextStep(const pair &current_position);
+    void SetEmptySquare(const pair &current_position);
 
  private:
     game_parameters params_;

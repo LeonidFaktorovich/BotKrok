@@ -73,6 +73,30 @@ struct HashPair {
     }
 };
 
+void Algorithm::Set(size_t x, size_t y, Square new_square) {
+    field_.SetSquare(x, y, new_square);
+}
+
+void Algorithm::SetEmptySquare(const pair &current_position) {
+    size_t height = field_.GetHeight();
+    size_t width = field_.GetWidth();
+    size_t radius = params_.view_radius;
+
+    size_t left_border = (current_position.first + width - radius) % width;
+    size_t right_border = (current_position.first + radius) % width;
+    size_t lower_border = (current_position.second + height - radius) % height;
+    size_t upper_border = (current_position.second + radius) % height;
+
+    for (size_t k = left_border; k != right_border; k = ++k % width) {
+        for (size_t l = lower_border; l != upper_border; l = ++l % height) {
+            if (std::pow(current_position.first - k, 2) + std::pow(current_position.second - l, 2) <= std::pow(radius, 2) &&
+                field_.GetSquare(k, l).Type() == SquareType::None) {
+                field_.SetSquare(k, l, Square(SquareType::Empty));
+            }
+        }
+    }
+}
+
 pair Algorithm::GetNextStep(const pair &current_position) {
     size_t height = field_.GetHeight();
     size_t width = field_.GetWidth();
