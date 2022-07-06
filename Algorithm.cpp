@@ -118,7 +118,7 @@ pair Algorithm::GetNextStep(const pair &current_position) {
                 for (size_t k = left_border; k != right_border; k = ++k % width) {
                     for (size_t l = lower_border; l != upper_border; l = ++l % height) {
 
-                        if (std::pow(i - j, 2) + std::pow(k - l, 2) <= std::pow(params_.mining_radius, 2)) {
+                        if (std::pow(i - k, 2) + std::pow(j - l, 2) <= std::pow(params_.mining_radius, 2)) {
                             has_coin_nearby.insert({k, l});
                         }
                     }
