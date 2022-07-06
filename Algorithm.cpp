@@ -144,13 +144,12 @@ pair Algorithm::GetNextStep(const pair &current_position) {
             if (!prev.contains(next) && (type == SquareType::Empty || type == SquareType::Coin)) {
                 prev[next] = now;
                 q.push(next);
-            }
-
-            if (has_coin_nearby.contains(next)) {
-                while (prev.at(next) != current_position) {
-                    next = prev.at(next);
+                if (has_coin_nearby.contains(next)) {
+                    while (prev.at(next) != current_position) {
+                        next = prev.at(next);
+                    }
+                    return next;
                 }
-                return next;
             }
         }
     }
