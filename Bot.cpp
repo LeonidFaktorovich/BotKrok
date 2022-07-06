@@ -16,12 +16,25 @@ void Bot::StartSession(const char *ip, int port) {
     size_t my_id = gameParameters.my_id;
     algorithm = new Algorithm(gameParameters);
     // тест ответа
+
+
     for (size_t i = 0; i < gameParameters.num_rounds; ++i) {
         message_type msg;
         socket_session_->Read(msg);
         auto my_pos = MsgProcess::GetData(msg, my_id, *algorithm);
-        algorithm->SetEmptySquare(my_pos);
-        auto [x_shift, y_shift] = algorithm->GetNextStep(my_pos);
+        auto [new_x, new_y] = algorithm->GetNextStep(my_pos);
+        int x_shift = static_cast<int>(new_x) - static_cast<int>(my_pos.first);
+        if (x_shift == static_cast<int>(gameParameters.map.map_width) - 1) {
+            x_shift = -1;
+        } else if (x_shift == -static_cast<int>(gameParameters.map.map_width) + 1) {
+            x_shift = 1;
+        }
+        int y_shift = (static_cast<int>(new_y) - static_cast<int>(my_pos.second));
+        if (y_shift == static_cast<int>(gameParameters.map.map_height) - 1) {
+            y_shift = -1;
+        } else if (y_shift == -static_cast<int>(gameParameters.map.map_height) + 1) {
+            y_shift = 1;
+        }
         answer = std::string("move\noffset ") + std::to_string(x_shift) + std::string(" ") + std::to_string(y_shift) + std::string("\nend\n");
         socket_session_->Write(answer);
     }

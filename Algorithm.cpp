@@ -3,6 +3,7 @@
 #include <queue>
 #include <unordered_map>
 #include <unordered_set>
+#include <iostream>
 
 map_size::map_size(size_t width, size_t height) {
     map_height = height;
@@ -89,8 +90,7 @@ void Algorithm::SetEmptySquare(const pair &current_position) {
 
     for (size_t k = left_border; k != right_border; k = ++k % width) {
         for (size_t l = lower_border; l != upper_border; l = ++l % height) {
-            if (std::pow(current_position.first - k, 2) + std::pow(current_position.second - l, 2) <= std::pow(radius, 2) &&
-                field_.GetSquare(k, l).Type() == SquareType::None) {
+            if (std::pow(current_position.first - k, 2) + std::pow(current_position.second - l, 2) <= std::pow(radius, 2)) {
                 field_.SetSquare(k, l, Square(SquareType::Empty));
             }
         }
@@ -98,6 +98,25 @@ void Algorithm::SetEmptySquare(const pair &current_position) {
 }
 
 pair Algorithm::GetNextStep(const pair &current_position) {
+    /*
+    for (int y_shift = -5; y_shift <= 5; ++y_shift) {
+        for (int x_shift = -5; x_shift <= 5; ++x_shift) {
+            auto type = field_.GetSquare((static_cast<int>(current_position.first) + x_shift + params_.map.map_width) % params_.map.map_width,
+                                         (static_cast<int>(current_position.second) + y_shift + params_.map.map_height) % params_.map.map_height).Type();
+            if (type == SquareType::None) {
+                std::cout << ' ';
+            } else if (type == SquareType::Coin) {
+                std::cout << '*';
+            } else if (type == SquareType::MyBot) {
+                std::cout << 'I';
+            } else if (type == SquareType::Block) {
+                std::cout << '.';
+            }
+        }
+        std::cout << std::endl;
+    }
+    */
+
     size_t height = field_.GetHeight();
     size_t width = field_.GetWidth();
 
@@ -115,9 +134,9 @@ pair Algorithm::GetNextStep(const pair &current_position) {
         for (size_t j = lower_border; j != upper_border; j = ++j % height) {
 
             if (field_.GetSquare(i, j).Type() == SquareType::Coin) {
+
                 for (size_t k = left_border; k != right_border; k = ++k % width) {
                     for (size_t l = lower_border; l != upper_border; l = ++l % height) {
-
                         if (std::pow(i - k, 2) + std::pow(j - l, 2) <= std::pow(params_.mining_radius, 2)) {
                             has_coin_nearby.insert({k, l});
                         }
