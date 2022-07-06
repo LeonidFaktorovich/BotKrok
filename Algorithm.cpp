@@ -1,5 +1,5 @@
 #include "Algorithm.h"
-#include <math.h>
+#include <cmath>
 #include <queue>
 #include <unordered_map>
 #include <unordered_set>
@@ -64,7 +64,7 @@ size_t Field::GetWidth() {
     return table_size_.map_width;
 }
 
-Algorithm::Algorithm(const game_parameters &params, const map_size &size) : params_(params), field_(size) {
+Algorithm::Algorithm(const game_parameters &params) : params_(params), field_(params.map) {
 }
 
 struct HashPair {
