@@ -1,6 +1,7 @@
 #pragma once
 #include <boost/array.hpp>
 #include <string>
+#include <vector>
 
 using pair = std::pair<size_t, size_t>;
 using message_type = boost::array<char, 4096>;

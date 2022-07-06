@@ -35,3 +35,27 @@ void MsgProcess::GetParameters(const message_type &msg, game_parameters &paramet
                              std::stoi(words[15]),
                              std::stoi(words[17]));
 }
+
+std::pair<size_t, size_t> MsgProcess::GetData(const message_type &msg, size_t my_id, Algorithm &algorithm) {
+    std::vector<std::string> cells;
+    std::pair<size_t, size_t> my_pos;
+    boost::split(cells, msg.data(), boost::is_any_of("\n"));
+    for (size_t i = 1; i + 1 < cells.size(); ++i) {
+        std::vector<std::string> cur_data;
+        boost::split(cur_data, cells[i], boost::is_any_of(" "));
+        if (cur_data[0] == "coin") {
+            algorithm.Set(std::stoi(cur_data[1]), std::stoi(cur_data[2]), Square(SquareType::Coin));
+        } else if (cur_data[0] == "block") {
+            algorithm.Set(std::stoi(cur_data[1]), std::stoi(cur_data[2]), Square(SquareType::Block));
+        } else if (cur_data[0] == "bot") {
+            if (std::stoi(cur_data[4]) == my_id) {
+                my_pos.first = std::stoi(cur_data[1]);
+                my_pos.second = std::stoi(cur_data[2]);
+                algorithm.Set(std::stoi(cur_data[1]), std::stoi(cur_data[2]), Square(SquareType::MyBot, std::stoi(cur_data[3])));
+            } else {
+                algorithm.Set(std::stoi(cur_data[1]), std::stoi(cur_data[2]), Square(SquareType::OtherBot, std::stoi(cur_data[3])));
+            }
+        }
+    }
+    return my_pos;
+}

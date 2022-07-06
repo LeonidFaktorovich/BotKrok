@@ -68,7 +68,7 @@ Algorithm::Algorithm(const game_parameters &params) : params_(params), field_(pa
 }
 
 struct HashPair {
-    size_t operator()(const pair &p) {
+    size_t operator()(const pair &p) const {
         return std::hash<size_t>()(p.first) ^ std::hash<size_t>()(p.second);
     }
 };
@@ -159,7 +159,6 @@ pair Algorithm::GetNextStep(const pair &current_position) {
     for (const auto &neigh : neighbours) {
         pair next = {(static_cast<int>(current_position.first + width) + neigh.first) % width,
                      (static_cast<int>(current_position.second + height) + neigh.second) % height};
-
         if (field_.GetSquare(next.first, next.second).Type() != SquareType::Block) {
             return next;
         }

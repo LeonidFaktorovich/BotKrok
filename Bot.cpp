@@ -13,12 +13,16 @@ void Bot::StartSession(const char *ip, int port) {
     socket_session_->Read(data_msg);
     game_parameters gameParameters;
     MsgProcess::GetParameters(data_msg, gameParameters);
+    size_t my_id = gameParameters.my_id;
     algorithm = new Algorithm(gameParameters);
     // тест ответа
     for (size_t i = 0; i < gameParameters.num_rounds; ++i) {
         message_type msg;
         socket_session_->Read(msg);
-        answer = "move\noffset -1 0\nend\n";
+        auto my_pos = MsgProcess::GetData(msg, my_id, *algorithm);
+        algorithm->SetEmptySquare(my_pos);
+        auto [x_shift, y_shift] = algorithm->GetNextStep(my_pos);
+        answer = std::string("move\noffset ") + std::to_string(x_shift) + std::string(" ") + std::to_string(y_shift) + std::string("\nend\n");
         socket_session_->Write(answer);
     }
     message_type finish_msg;
