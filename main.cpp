@@ -1,14 +1,14 @@
-#include <iostream>
-#include <boost/asio.hpp>
-#include <boost/array.hpp>
-#include <string>
 #include "Bot.h"
+#include <boost/array.hpp>
+#include <boost/asio.hpp>
+#include <iostream>
+#include <string>
 
 using namespace boost::asio;
 using ip::tcp;
-using std::string;
 using std::cout;
 using std::endl;
+using std::string;
 int main() {
     /*
     boost::asio::io_context io_context;
@@ -59,7 +59,7 @@ int main() {
     */
     Bot my_bot("Kaban", "_", "FRIENDLY");
     const char ip[] = "127.0.0.1";
-    int port =2021;
+    int port = 2021;
     my_bot.StartSession(ip, port);
     return 0;
 }
