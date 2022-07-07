@@ -1,9 +1,10 @@
 #include "Algorithm.h"
+#include <boost/functional/hash.hpp>
 #include <cmath>
+#include <iostream>
 #include <queue>
 #include <unordered_map>
 #include <unordered_set>
-#include <iostream>
 
 map_size::map_size(size_t width, size_t height) {
     map_height = height;
@@ -68,30 +69,25 @@ size_t Field::GetWidth() {
 Algorithm::Algorithm(const game_parameters &params) : params_(params), field_(params.map) {
 }
 
-struct HashPair {
-    size_t operator()(const pair &p) const {
-        return std::hash<size_t>()(p.first) ^ std::hash<size_t>()(p.second);
-    }
-};
-
 void Algorithm::Set(size_t x, size_t y, Square new_square) {
     field_.SetSquare(x, y, new_square);
 }
 
 void Algorithm::SetEmptySquare(const pair &current_position) {
-    size_t height = field_.GetHeight();
-    size_t width = field_.GetWidth();
-    size_t radius = params_.view_radius;
+    int height = field_.GetHeight();
+    int width = field_.GetWidth();
+    int radius = params_.view_radius;
+    int x_pos = static_cast<int>(current_position.first);
+    int y_pos = static_cast<int>(current_position.second);
+    int left_border = (static_cast<int>(current_position.first) - radius) % width;
+    int right_border = (static_cast<int>(current_position.first) + radius) % width;
+    int lower_border = (static_cast<int>(current_position.second) - radius) % height;
+    int upper_border = (static_cast<int>(current_position.second) + radius) % height;
 
-    size_t left_border = (current_position.first + width - radius) % width;
-    size_t right_border = (current_position.first + radius) % width;
-    size_t lower_border = (current_position.second + height - radius) % height;
-    size_t upper_border = (current_position.second + radius) % height;
-
-    for (size_t k = left_border; k != right_border; k = ++k % width) {
-        for (size_t l = lower_border; l != upper_border; l = ++l % height) {
-            if (std::pow(current_position.first - k, 2) + std::pow(current_position.second - l, 2) <= std::pow(radius, 2)) {
-                field_.SetSquare(k, l, Square(SquareType::Empty));
+    for (int k = left_border; k != right_border; k = ++k % width) {
+        for (int l = lower_border; l != upper_border; l = ++l % height) {
+            if (std::pow(x_pos - k, 2) + std::pow(y_pos - l, 2) <= std::pow(radius, 2)) {
+                field_.SetSquare((k + width) % width, (l + height) % height, Square(SquareType::Empty));
             }
         }
     }
@@ -99,44 +95,49 @@ void Algorithm::SetEmptySquare(const pair &current_position) {
 
 pair Algorithm::GetNextStep(const pair &current_position) {
     /*
-    for (int y_shift = -5; y_shift <= 5; ++y_shift) {
-        for (int x_shift = -5; x_shift <= 5; ++x_shift) {
-            auto type = field_.GetSquare((static_cast<int>(current_position.first) + x_shift + params_.map.map_width) % params_.map.map_width,
-                                         (static_cast<int>(current_position.second) + y_shift + params_.map.map_height) % params_.map.map_height).Type();
+    for (int y_shift = 2; y_shift >= -2; --y_shift) {
+        for (int x_shift = -2; x_shift <= 2; ++x_shift) {
+            if (y_shift == 0 && x_shift == 0) {
+                    std::cout << 'I';
+                    continue;
+                }
+            auto type = field_.GetSquare((static_cast<int>(current_position.first + params_.map.map_width) + x_shift) % params_.map.map_width,
+                                         (static_cast<int>(current_position.second + params_.map.map_height) + y_shift) % params_.map.map_height).Type();
             if (type == SquareType::None) {
-                std::cout << ' ';
+                std::cout << 'N';
             } else if (type == SquareType::Coin) {
                 std::cout << '*';
-            } else if (type == SquareType::MyBot) {
-                std::cout << 'I';
             } else if (type == SquareType::Block) {
                 std::cout << '.';
+            } else if (type == SquareType::Empty) {
+                std::cout << '-';
             }
         }
         std::cout << std::endl;
     }
-    */
+    std::cout << std::endl;
+     */
 
-    size_t height = field_.GetHeight();
-    size_t width = field_.GetWidth();
+    int height = field_.GetHeight();
+    int width = field_.GetWidth();
 
-    size_t radius_height = std::min(static_cast<size_t>(25), height / 2);
-    size_t radius_width = std::min(static_cast<size_t>(25), width / 2);
+    int radius_height = std::min(25, height / 2);
+    int radius_width = std::min(25, width / 2);
 
-    size_t left_border = (current_position.first + width - radius_width) % width;
-    size_t right_border = (current_position.first + radius_width) % width;
-    size_t lower_border = (current_position.second + height - radius_height) % height;
-    size_t upper_border = (current_position.second + radius_height) % height;
+    int left_border = (current_position.first + width - radius_width) % width;
+    int right_border = (current_position.first + radius_width) % width;
+    int lower_border = (current_position.second + height - radius_height) % height;
+    int upper_border = (current_position.second + radius_height) % height;
 
-    std::unordered_set<pair, HashPair> has_coin_nearby;
+    std::unordered_set<pair, boost::hash<pair>> has_coin_nearby;
 
-    for (size_t i = left_border; i != right_border; i = ++i % width) {
-        for (size_t j = lower_border; j != upper_border; j = ++j % height) {
+    for (int i = left_border; i != right_border; i = ++i % width) {
+        for (int j = lower_border; j != upper_border; j = ++j % height) {
 
             if (field_.GetSquare(i, j).Type() == SquareType::Coin) {
 
-                for (size_t k = left_border; k != right_border; k = ++k % width) {
-                    for (size_t l = lower_border; l != upper_border; l = ++l % height) {
+                for (int k = left_border; k != right_border; k = ++k % width) {
+                    for (int l = lower_border; l != upper_border; l = ++l % height) {
                         if (std::pow(i - k, 2) + std::pow(j - l, 2) <= std::pow(params_.mining_radius, 2)) {
                             has_coin_nearby.insert({k, l});
                         }
@@ -146,7 +147,7 @@ pair Algorithm::GetNextStep(const pair &current_position) {
         }
     }
 
-    std::unordered_map<pair, pair, HashPair> prev;
+    std::unordered_map<pair, pair, boost::hash<pair>> prev;
     std::queue<pair> q;
     q.push(current_position);
 
@@ -175,6 +176,7 @@ pair Algorithm::GetNextStep(const pair &current_position) {
 
     // if no coins are found
     for (const auto &neigh : neighbours) {
+        std::cout << "No coins" << std::endl;
         pair next = {(static_cast<int>(current_position.first + width) + neigh.first) % width,
                      (static_cast<int>(current_position.second + height) + neigh.second) % height};
         if (field_.GetSquare(next.first, next.second).Type() != SquareType::Block) {

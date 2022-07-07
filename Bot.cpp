@@ -1,6 +1,7 @@
 #include "Bot.h"
-
-Bot::Bot(std::string bot_name, std::string bot_secret, std::string match_mode) : bot_name_(bot_name), bot_secret_(bot_secret), match_mode_(match_mode) {
+Bot::Bot(std::string bot_name, std::string bot_secret, std::string match_mode) : bot_name_(bot_name),
+                                                                                 bot_secret_(bot_secret),
+                                                                                 match_mode_(match_mode) {
 }
 
 void Bot::StartSession(const char *ip, int port) {
@@ -17,9 +18,9 @@ void Bot::StartSession(const char *ip, int port) {
     algorithm = new Algorithm(gameParameters);
     // тест ответа
 
-
     for (size_t i = 0; i < gameParameters.num_rounds; ++i) {
         message_type msg;
+        std::cout << "Step " << i << ' ' << std::endl;
         socket_session_->Read(msg);
         auto my_pos = MsgProcess::GetData(msg, my_id, *algorithm);
         auto [new_x, new_y] = algorithm->GetNextStep(my_pos);

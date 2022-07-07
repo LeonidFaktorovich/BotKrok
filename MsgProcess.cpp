@@ -1,6 +1,6 @@
 #include "MsgProcess.h"
+
 #include <boost/array.hpp>
-#include <iostream>
 #include <vector>
 
 std::string MsgProcess::HelloAnswer(const std::string &bot_name, const std::string &bot_secret, const std::string &match_mode) {
@@ -40,7 +40,7 @@ std::pair<size_t, size_t> MsgProcess::GetData(const message_type &msg, size_t my
     std::vector<std::string> cells;
     std::pair<size_t, size_t> my_pos;
     boost::split(cells, msg.data(), boost::is_any_of("\n"));
-    for (size_t i = 1; i + 1 < cells.size(); ++i) {
+    for (size_t i = 2; i + 1 < cells.size(); ++i) {
         std::vector<std::string> cur_data;
         boost::split(cur_data, cells[i], boost::is_any_of(" "));
         if (cur_data[0] == "bot" && std::stoi(cur_data[4]) == my_id) {
@@ -49,11 +49,15 @@ std::pair<size_t, size_t> MsgProcess::GetData(const message_type &msg, size_t my
         }
     }
     algorithm.SetEmptySquare(my_pos);
-    for (size_t i = 1; i + 1 < cells.size(); ++i) {
+    for (size_t i = 2; i + 1 < cells.size(); ++i) {
         std::vector<std::string> cur_data;
         boost::split(cur_data, cells[i], boost::is_any_of(" "));
+        if (cur_data[0] == "end") {
+            break;
+        }
         if (cur_data[0] == "coin") {
             algorithm.Set(std::stoi(cur_data[1]), std::stoi(cur_data[2]), Square(SquareType::Coin));
+
         } else if (cur_data[0] == "block") {
             algorithm.Set(std::stoi(cur_data[1]), std::stoi(cur_data[2]), Square(SquareType::Block));
         } else if (cur_data[0] == "bot") {

@@ -4,7 +4,7 @@
 #include <vector>
 
 using pair = std::pair<size_t, size_t>;
-using message_type = boost::array<char, 4096>;
+using message_type = boost::array<char, 15000>;
 
 struct map_size {
     map_size() = default;

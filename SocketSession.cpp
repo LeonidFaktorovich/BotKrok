@@ -1,7 +1,5 @@
 #include "SocketSession.h"
 
-using message_type = boost::array<char, 4096>;
-
 SocketSession::SocketSession(const char *ip, int port) : socket_(io_context_) {
     using namespace boost::asio;
     using ip::tcp;
