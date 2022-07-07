@@ -21,6 +21,7 @@ class Bot
     std::string bot_secret_;
     std::string match_mode_;
     Algorithm* algorithm = nullptr;
+    std::vector<std::pair<int, int>> history_of_step_ = {{-1, -1}};
 };
 
 #endif//BOTKROK__BOT_H_

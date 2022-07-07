@@ -5,6 +5,7 @@
 #include <queue>
 #include <unordered_map>
 #include <unordered_set>
+#include <boost/range/algorithm/random_shuffle.hpp>
 
 map_size::map_size(size_t width, size_t height) {
     map_height = height;
@@ -93,8 +94,9 @@ void Algorithm::SetEmptySquare(const pair &current_position) {
     }
 }
 
-pair Algorithm::GetNextStep(const pair &current_position) {
-    /*
+pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, int>& last_step) {
+
+    std::cout << "Cur_pos: " << current_position.first << ' ' << current_position.second << std::endl;
     for (int y_shift = 2; y_shift >= -2; --y_shift) {
         for (int x_shift = -2; x_shift <= 2; ++x_shift) {
             if (y_shift == 0 && x_shift == 0) {
@@ -116,7 +118,7 @@ pair Algorithm::GetNextStep(const pair &current_position) {
         std::cout << std::endl;
     }
     std::cout << std::endl;
-     */
+
 
     int height = field_.GetHeight();
     int width = field_.GetWidth();
@@ -151,7 +153,10 @@ pair Algorithm::GetNextStep(const pair &current_position) {
     std::queue<pair> q;
     q.push(current_position);
 
-    std::vector<std::pair<int, int>> neighbours{{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}};
+    std::vector<std::pair<int, int>> neighbours{{-1, -1}, {-1, 0},
+                                                {-1, 1}, {0, 1},
+                                                {1, 1}, {1, 0},
+                                                {1, -1}, {0, -1}};
 
     while (!q.empty()) {
         auto now = q.front();
@@ -175,10 +180,27 @@ pair Algorithm::GetNextStep(const pair &current_position) {
     }
 
     // if no coins are found
+    //boost::range::random_shuffle(neighbours);
+    /*
+    size_t last_step_ind = 0;
+    while (neighbours[last_step_ind] != last_step) {
+        ++last_step_ind;
+    }
+    for (size_t index = last_step_ind;;index = (index + 1) % neighbours.size()) {
+        std::cout << "No coins" << std::endl;
+        pair next = {(static_cast<int>(current_position.first + width) + neighbours[index].first) % width,
+                     (static_cast<int>(current_position.second + height) + neighbours[index].second) % height};
+        std::cout << next.first << ' ' << next.second << std::endl;
+        if (field_.GetSquare(next.first, next.second).Type() != SquareType::Block) {
+            return next;
+        }
+    }
+     */
     for (const auto &neigh : neighbours) {
         std::cout << "No coins" << std::endl;
         pair next = {(static_cast<int>(current_position.first + width) + neigh.first) % width,
                      (static_cast<int>(current_position.second + height) + neigh.second) % height};
+        std::cout << next.first << ' ' << next.second << std::endl;
         if (field_.GetSquare(next.first, next.second).Type() != SquareType::Block) {
             return next;
         }
