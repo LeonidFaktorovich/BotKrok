@@ -58,6 +58,16 @@ class Square
     size_t coin_number_;
 };
 
+class Col
+{
+ public:
+    Col(size_t size);
+    Square &operator[](size_t y);
+
+ private:
+    std::vector<Square> col_;
+};
+
 class Field
 {
  public:
@@ -68,7 +78,7 @@ class Field
     size_t GetWidth();
 
  private:
-    std::vector<std::vector<Square>> table_;
+    std::vector<Col> table_;
     map_size table_size_;
 };
 

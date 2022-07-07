@@ -126,20 +126,20 @@ pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, i
     int radius_height = std::min(25, height / 2);
     int radius_width = std::min(25, width / 2);
 
-    int left_border = (current_position.first + width - radius_width) % width;
-    int right_border = (current_position.first + radius_width) % width;
-    int lower_border = (current_position.second + height - radius_height) % height;
-    int upper_border = (current_position.second + radius_height) % height;
+    int left_border = static_cast<int>(current_position.first) - radius_width;
+    int right_border = static_cast<int>(current_position.first) + radius_width;
+    int lower_border = static_cast<int>(current_position.second) - radius_height;
+    int upper_border = static_cast<int>(current_position.second) + radius_height;
 
     std::unordered_set<pair, boost::hash<pair>> has_coin_nearby;
 
-    for (int i = left_border; i != right_border; i = ++i % width) {
-        for (int j = lower_border; j != upper_border; j = ++j % height) {
+    for (int i = left_border; i != right_border; i = (i + 1) % width) {
+        for (int j = lower_border; j != upper_border; j = (j + 1) % height) {
 
             if (field_.GetSquare(i, j).Type() == SquareType::Coin) {
 
-                for (int k = left_border; k != right_border; k = ++k % width) {
-                    for (int l = lower_border; l != upper_border; l = ++l % height) {
+                for (int k = left_border; k != right_border; k = (k + 1) % width) {
+                    for (int l = lower_border; l != upper_border; l = (l + 1) % height) {
                         if (std::pow(i - k, 2) + std::pow(j - l, 2) <= std::pow(params_.mining_radius, 2)) {
                             has_coin_nearby.insert({k, l});
                         }

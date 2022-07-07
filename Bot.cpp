@@ -37,7 +37,7 @@ void Bot::StartSession(const char *ip, int port) {
         } else if (y_shift == -static_cast<int>(gameParameters.map.map_height) + 1) {
             y_shift = 1;
         }
-        history_of_step_.emplace_back(static_cast<int>(x_shift), static_cast<int>(y_shift));
+        history_of_step_.emplace_back(x_shift, y_shift);
         answer = std::string("move\noffset ") + std::to_string(x_shift) + std::string(" ") + std::to_string(y_shift) + std::string("\nend\n");
         socket_session_->Write(answer);
     }
