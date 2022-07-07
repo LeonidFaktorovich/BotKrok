@@ -76,9 +76,9 @@ class Field
     const Square &GetSquare(size_t x, size_t y);
     size_t GetHeight();
     size_t GetWidth();
-
+    size_t GetDistanceSquare(const std::pair<int, int>& point1, const std::pair<int, int>& point2) const;
  private:
-    std::vector<Col> table_;
+    std::vector<std::vector<Square>> table_;
     map_size table_size_;
 };
 

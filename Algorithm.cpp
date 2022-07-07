@@ -5,7 +5,6 @@
 #include <queue>
 #include <unordered_map>
 #include <unordered_set>
-#include <boost/range/algorithm/random_shuffle.hpp>
 
 map_size::map_size(size_t width, size_t height) {
     map_height = height;
@@ -141,7 +140,7 @@ pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, i
                 for (int k = left_border; k != right_border; k = (k + 1) % width) {
                     for (int l = lower_border; l != upper_border; l = (l + 1) % height) {
                         if (std::pow(i - k, 2) + std::pow(j - l, 2) <= std::pow(params_.mining_radius, 2)) {
-                            has_coin_nearby.insert({k, l});
+                            has_coin_nearby.insert({(k + width) % width, (l + height) % height});
                         }
                     }
                 }
@@ -181,12 +180,15 @@ pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, i
 
     // if no coins are found
     //boost::range::random_shuffle(neighbours);
-    /*
+
     size_t last_step_ind = 0;
     while (neighbours[last_step_ind] != last_step) {
         ++last_step_ind;
     }
     for (size_t index = last_step_ind;;index = (index + 1) % neighbours.size()) {
+        if (index == (last_step_ind + 4) % neighbours.size()) {
+            continue;
+        }
         std::cout << "No coins" << std::endl;
         pair next = {(static_cast<int>(current_position.first + width) + neighbours[index].first) % width,
                      (static_cast<int>(current_position.second + height) + neighbours[index].second) % height};
@@ -195,7 +197,9 @@ pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, i
             return next;
         }
     }
-     */
+    return {(static_cast<int>(current_position.first + width) + neighbours[(last_step_ind + 4) % neighbours.size()].first) % width,
+             (static_cast<int>(current_position.second + height) + neighbours[(last_step_ind + 4) % neighbours.size()].second) % height};
+    /*
     for (const auto &neigh : neighbours) {
         std::cout << "No coins" << std::endl;
         pair next = {(static_cast<int>(current_position.first + width) + neigh.first) % width,
@@ -205,4 +209,15 @@ pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, i
             return next;
         }
     }
+     */
+}
+
+size_t Field::GetDistanceSquare(const std::pair<int, int>& point1, const std::pair<int, int>& point2) const {
+    int width = static_cast<int>(table_size_.map_width);
+    int height = static_cast<int>(table_size_.map_height);
+    size_t standard_x_diff = std::abs((point2.first % width + width) % width - (point1.first % width + width) % width);
+    size_t standard_y_diff = std::abs((point2.second % height + height) % height - (point1.second % height + height) % height);
+    size_t x_diff_square = std::min(standard_x_diff, width - standard_x_diff) * std::min(standard_x_diff, width - standard_x_diff);
+    size_t y_diff_square = std::min(standard_y_diff, height - standard_y_diff) * std::min(standard_y_diff, height - standard_y_diff);
+    return x_diff_square + y_diff_square;
 }
