@@ -3,14 +3,14 @@
 #include <string>
 #include <vector>
 
-using pair = std::pair<size_t, size_t>;
+using pair = std::pair<int, int>;
 using message_type = boost::array<char, 15000>;
 
 struct map_size {
     map_size() = default;
-    map_size(size_t width, size_t height);
-    size_t map_width;
-    size_t map_height;
+    map_size(int width, int height);
+    int map_width;
+    int map_height;
 };
 
 struct game_parameters {
@@ -62,7 +62,7 @@ class Col
 {
  public:
     Col(size_t size);
-    Square &operator[](size_t y);
+    Square &operator[](int y);
 
  private:
     std::vector<Square> col_;
@@ -72,13 +72,11 @@ class Field
 {
  public:
     Field(const map_size &size);
-    void SetSquare(size_t x, size_t y, Square new_square);
-    const Square &GetSquare(size_t x, size_t y);
-    size_t GetHeight();
-    size_t GetWidth();
+    Col &operator[](int x);
+    const map_size& GetSize() const;
     size_t GetDistanceSquare(const std::pair<int, int>& point1, const std::pair<int, int>& point2) const;
  private:
-    std::vector<std::vector<Square>> table_;
+    std::vector<Col> table_;
     map_size table_size_;
 };
 
@@ -86,8 +84,8 @@ class Algorithm
 {
  public:
     Algorithm(const game_parameters &params);
-    void Set(size_t x, size_t y, Square new_square);
-    pair GetNextStep(const pair &current_position, const std::pair<int, int>& last_step);
+    void Set(int x, int y, Square new_square);
+    pair GetNextStep(const pair &current_position, const std::pair<int, int> &last_step);
     void SetEmptySquare(const pair &current_position);
 
  private:
