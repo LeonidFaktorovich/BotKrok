@@ -80,6 +80,32 @@ class Field
     map_size table_size_;
 };
 
+class IteratorRectangle {
+ public:
+    IteratorRectangle(Field& field, pair center, pair pos, int radius_width, int radius_height);
+    IteratorRectangle& operator++();
+    pair operator*();
+    bool operator !=(const IteratorRectangle& end) const;
+ private:
+    Field* field_;
+    pair pos;
+    int radius_width;
+    int radius_height;
+    pair center;
+};
+
+class BigRectangle {
+ public:
+    BigRectangle(Field& field, pair center, int radius_width, int radius_height);
+    IteratorRectangle begin();
+    IteratorRectangle end();
+ private:
+    Field* field_;
+    pair center;
+    int radius_width;
+    int radius_height;
+};
+
 class Algorithm
 {
  public:

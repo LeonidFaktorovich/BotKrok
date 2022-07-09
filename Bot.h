@@ -11,7 +11,7 @@ class Bot
  public:
     Bot(std::string bot_name,
         std::string bot_secret,
-        std::string match_mode);
+        MatchMode match_mode);
     void StartSession(const char* ip, int port);
     ~Bot();
 
@@ -19,7 +19,7 @@ class Bot
     SocketSession* socket_session_ = nullptr;
     std::string bot_name_;
     std::string bot_secret_;
-    std::string match_mode_;
+    MatchMode match_mode_;
     Algorithm* algorithm = nullptr;
     std::vector<std::pair<int, int>> history_of_step_ = {{-1, -1}};
 };

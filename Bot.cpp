@@ -1,5 +1,5 @@
 #include "Bot.h"
-Bot::Bot(std::string bot_name, std::string bot_secret, std::string match_mode) : bot_name_(bot_name),
+Bot::Bot(std::string bot_name, std::string bot_secret, MatchMode match_mode) : bot_name_(bot_name),
                                                                                  bot_secret_(bot_secret),
                                                                                  match_mode_(match_mode) {
 }
@@ -8,12 +8,19 @@ void Bot::StartSession(const char *ip, int port) {
     socket_session_ = new SocketSession(ip, port);
     message_type hello_msg;
     socket_session_->Read(hello_msg);
-    std::string answer = MsgProcess::HelloAnswer(bot_name_, bot_secret_, match_mode_);
+    std::string answer;
+    if (match_mode_ == MatchMode::FRIENDLY) {
+        answer = MsgProcess::HelloAnswer(bot_name_, bot_secret_, "FRIENDLY");
+
+    } else if (match_mode_ == MatchMode::DEATHMATCH) {
+        answer = MsgProcess::HelloAnswer(bot_name_, bot_secret_, "DEATHMATCH");
+
+    }
     socket_session_->Write(answer);
     message_type data_msg;
     socket_session_->Read(data_msg);
     game_parameters gameParameters;
-    MsgProcess::GetParameters(data_msg, gameParameters);
+    MsgProcess::GetParameters(data_msg, gameParameters, match_mode_);
     size_t my_id = gameParameters.my_id;
     algorithm = new Algorithm(gameParameters);
     // тест ответа

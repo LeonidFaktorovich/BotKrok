@@ -9,31 +9,33 @@ std::string MsgProcess::HelloAnswer(const std::string &bot_name, const std::stri
     return result_string;
 }
 
-void MsgProcess::GetParameters(const message_type &msg, game_parameters &parameters) {
+void MsgProcess::GetParameters(const message_type &msg, game_parameters &parameters, MatchMode match_mode) {
     std::vector<std::string> words;
     boost::split(words, msg.data(), boost::is_any_of("\n "));
-    // для DEATHMATCH
-    /*
-    parameters.SetParameters(words[2],
-                             std::stoi(words[4]),
-                             map_size(std::stoi(words[8]), std::stoi(words[9])),
-                             std::stoi(words[11]),
-                             std::stoi(words[13]),
-                             std::stoi(words[15]),
-                             std::stoi(words[17]),
-                             std::stoi(words[19]),
-                             std::stoi(words[21]));
-                             */
-    // для FRIENDLY
-    parameters.SetParameters("1",
-                             std::stoi(words[2]),
-                             map_size(std::stoi(words[6]), std::stoi(words[7])),
-                             1,
-                             std::stoi(words[9]),
-                             std::stoi(words[11]),
-                             std::stoi(words[13]),
-                             std::stoi(words[15]),
-                             std::stoi(words[17]));
+    if (match_mode == MatchMode::DEATHMATCH) {
+        parameters.SetParameters("1",
+                                 std::stoi(words[2]),
+                                 map_size(std::stoi(words[6]), std::stoi(words[7])),
+                                 2,
+                                 std::stoi(words[9]),
+                                 std::stoi(words[11]),
+                                 std::stoi(words[13]),
+                                 std::stoi(words[15]),
+                                 std::stoi(words[17]));
+    }
+
+    else if (match_mode == MatchMode::FRIENDLY) {
+        parameters.SetParameters("1",
+                                 std::stoi(words[2]),
+                                 map_size(std::stoi(words[6]), std::stoi(words[7])),
+                                 1,
+                                 std::stoi(words[9]),
+                                 std::stoi(words[11]),
+                                 std::stoi(words[13]),
+                                 std::stoi(words[15]),
+                                 std::stoi(words[17]));
+    }
+
 }
 
 std::pair<size_t, size_t> MsgProcess::GetData(const message_type &msg, size_t my_id, Algorithm &algorithm) {

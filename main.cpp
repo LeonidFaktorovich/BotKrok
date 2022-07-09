@@ -57,9 +57,12 @@ int main() {
     std::cout << answer << std::endl;
     soc.Write(answer);
     */
-    Bot my_bot("Kaban", "_", "FRIENDLY");
+
+    Bot my_bot("Kaban", "Baza", MatchMode::FRIENDLY);
     const char ip[] = "127.0.0.1";
     int port = 2021;
     my_bot.StartSession(ip, port);
+
+
     return 0;
 }

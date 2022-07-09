@@ -1,9 +1,7 @@
 #include "Algorithm.h"
 
 #include <boost/functional/hash.hpp>
-#include <boost/range/algorithm/random_shuffle.hpp>
 #include <cmath>
-#include <iostream>
 #include <queue>
 #include <unordered_map>
 #include <unordered_set>
@@ -80,10 +78,12 @@ void Algorithm::Set(int x, int y, Square new_square) {
 }
 
 void Algorithm::SetEmptySquare(const pair &current_position) {
+    /*
     int width = field_.GetSize().map_width;
     int height = field_.GetSize().map_height;
+     */
     int radius = params_.view_radius;
-
+    /*
     int x_pos = static_cast<int>(current_position.first);
     int y_pos = static_cast<int>(current_position.second);
 
@@ -99,6 +99,13 @@ void Algorithm::SetEmptySquare(const pair &current_position) {
             }
         }
     }
+     */
+    //std::cout << (*BigRectangle(field_, current_position, radius, radius).begin()).first << ' ' << (*BigRectangle(field_, current_position, radius, radius).begin()).second << std::endl;
+    for (const auto& [x, y] : BigRectangle(field_, current_position, radius, radius)) {
+        if (field_.GetDistanceSquare(current_position, {x, y}) <= radius * radius) {
+            field_[x][y] = Square(SquareType::Empty);
+        }
+    }
 }
 
 pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, int> &last_step) {
@@ -110,8 +117,8 @@ pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, i
                 std::cout << 'I';
                 continue;
             }
-            auto type = field_.GetSquare((static_cast<int>(current_position.first + params_.map.map_width) + x_shift) % params_.map.map_width,
-                                         (static_cast<int>(current_position.second + params_.map.map_height) + y_shift) % params_.map.map_height)
+            auto type = field_[(static_cast<int>(current_position.first + params_.map.map_width) + x_shift) % params_.map.map_width]
+                                         [(static_cast<int>(current_position.second + params_.map.map_height) + y_shift) % params_.map.map_height]
                             .Type();
             if (type == SquareType::None) {
                 std::cout << 'N';
@@ -134,13 +141,13 @@ pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, i
 
     int x_pos = static_cast<int>(current_position.first);
     int y_pos = static_cast<int>(current_position.second);
-
+    std::unordered_set<pair, boost::hash<pair>> has_coin_nearby;
+    /*
     int left_bord = (x_pos - radius) % width;
     int right_bord = (x_pos + radius) % width;
     int lower_bord = (y_pos - radius) % height;
     int upper_bord = (y_pos + radius) % height;
 
-    std::unordered_set<pair, boost::hash<pair>> has_coin_nearby;
 
     for (int x1 = left_bord; x1 != right_bord; x1 = (x1 + 1) % width) {
         for (int y1 = lower_bord; y1 != upper_bord; y1 = (y1 + 1) % height) {
@@ -151,6 +158,16 @@ pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, i
                             has_coin_nearby.insert({(x2 + width) % width, (y2 + height) % height});
                         }
                     }
+                }
+            }
+        }
+    }
+     */
+    for (const auto& [x1, y1] : BigRectangle(field_, current_position, radius, radius)) {
+        if (field_[x1][y1].Type() == SquareType::Coin) {
+            for (const auto& [x2, y2] : BigRectangle(field_, current_position, radius, radius)) {
+                if (field_.GetDistanceSquare({x1, y1}, {x2, y2}) <= params_.mining_radius * params_.mining_radius) {
+                    has_coin_nearby.insert({x2, y2});
                 }
             }
         }
@@ -166,8 +183,8 @@ pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, i
         auto now = q.front();
         q.pop();
         for (const auto &neigh : neighbours) {
-            pair next = {(static_cast<int>(now.first + width) + neigh.first) % width,
-                         (static_cast<int>(now.second + height) + neigh.second) % height};
+            pair next = {(now.first + width + neigh.first) % width,
+                         (now.second + height + neigh.second) % height};
 
             const auto &type = field_[next.first][next.second].Type();
             if (!prev.contains(next) && (type == SquareType::Empty || type == SquareType::Coin)) {
@@ -194,10 +211,10 @@ pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, i
         if (index == (last_step_ind + 4) % neighbours.size()) {
             continue;
         }
-        std::cout << "No coins" << std::endl;
+        //std::cout << "No coins" << std::endl;
         pair next = {(static_cast<int>(current_position.first + width) + neighbours[index].first) % width,
                      (static_cast<int>(current_position.second + height) + neighbours[index].second) % height};
-        std::cout << next.first << ' ' << next.second << std::endl;
+        //std::cout << next.first << ' ' << next.second << std::endl;
         if (field_[next.first][next.second].Type() != SquareType::Block) {
             return next;
         }
@@ -225,4 +242,51 @@ size_t Field::GetDistanceSquare(const std::pair<int, int> &point1, const std::pa
     size_t x_diff_square = std::min(standard_x_diff, width - standard_x_diff) * std::min(standard_x_diff, width - standard_x_diff);
     size_t y_diff_square = std::min(standard_y_diff, height - standard_y_diff) * std::min(standard_y_diff, height - standard_y_diff);
     return x_diff_square + y_diff_square;
+}
+
+BigRectangle::BigRectangle(Field &field, pair center, int radius_width, int radius_height) : field_(&field),
+                                                                                             radius_width(radius_width), radius_height(radius_height) {
+    int x = (center.first % field_->GetSize().map_width + field_->GetSize().map_width) % field_->GetSize().map_width;
+    int y = (center.second % field_->GetSize().map_height + field_->GetSize().map_height) % field_->GetSize().map_height;
+    this->center.first = x;
+    this->center.second = y;
+}
+
+IteratorRectangle BigRectangle::begin() {
+    return IteratorRectangle(*field_, center, {center.first - radius_width, center.second - radius_height}, radius_width, radius_height);
+}
+
+IteratorRectangle BigRectangle::end() {
+    return IteratorRectangle(*field_, center, {center.first + radius_width + 1, center.second - radius_height}, radius_width, radius_height);
+}
+
+IteratorRectangle::IteratorRectangle(Field &field, pair center, pair pos, int radius_width, int radius_height) :
+                                                                                                                 field_(&field),
+                                                                                                                 pos(std::move(pos)),
+                                                                                                                 radius_width(radius_width),
+                                                                                                                 radius_height(radius_height), center(std::move(center)){
+}
+
+bool IteratorRectangle::operator!=(const IteratorRectangle& end) const {
+    //int pos_x_cur = (pos.first % field_->GetSize().map_width + field_->GetSize().map_width) % field_->GetSize().map_width;
+    //int pos_y_cur = (pos.second % field_->GetSize().map_height + field_->GetSize().map_height) % field_->GetSize().map_height;
+    //int pos_x_end = (end.pos.first % end.field_->GetSize().map_width + end.field_->GetSize().map_width) % end.field_->GetSize().map_width;
+    //int pos_y_end = (end.pos.second % end.field_->GetSize().map_height + end.field_->GetSize().map_height) % end.field_->GetSize().map_height;
+    return std::tie(field_, pos.first, pos.second) != std::tie(end.field_, end.pos.first, end.pos.second);
+}
+
+IteratorRectangle &IteratorRectangle::operator++() {
+    if ((pos.second - (center.second + radius_height)) == 0) {
+        pos.second = center.second - radius_height;
+        pos.first += 1;
+        return *this;
+    }
+    pos.second += 1;
+    return *this;
+}
+
+pair IteratorRectangle::operator*() {
+    int x = (pos.first % field_->GetSize().map_width + field_->GetSize().map_width) % field_->GetSize().map_width;
+    int y = (pos.second % field_->GetSize().map_height + field_->GetSize().map_height) % field_->GetSize().map_height;
+    return {x, y};
 }
