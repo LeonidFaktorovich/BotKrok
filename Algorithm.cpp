@@ -52,7 +52,7 @@ Col::Col(size_t size) : col_(size) {
 }
 
 Square &Col::operator[](int y) {
-    y = (y % col_.size() + col_.size()) % col_.size();
+    y = (y % static_cast<int>(col_.size()) + static_cast<int>(col_.size())) % static_cast<int>(col_.size());
     return col_[y];
 }
 
@@ -207,8 +207,14 @@ pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, i
     while (neighbours[last_step_ind] != last_step) {
         ++last_step_ind;
     }
+    bool only_back = false;
     for (size_t index = last_step_ind;; index = (index + 1) % neighbours.size()) {
         if (index == (last_step_ind + 4) % neighbours.size()) {
+            if (only_back) {
+                return {(static_cast<int>(current_position.first + width) + neighbours[(last_step_ind + 4) % neighbours.size()].first) % width,
+                        (static_cast<int>(current_position.second + height) + neighbours[(last_step_ind + 4) % neighbours.size()].second) % height};
+            }
+            only_back = true;
             continue;
         }
         //std::cout << "No coins" << std::endl;
@@ -219,8 +225,6 @@ pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, i
             return next;
         }
     }
-    return {(static_cast<int>(current_position.first + width) + neighbours[(last_step_ind + 4) % neighbours.size()].first) % width,
-            (static_cast<int>(current_position.second + height) + neighbours[(last_step_ind + 4) % neighbours.size()].second) % height};
     /*
     for (const auto &neigh : neighbours) {
         std::cout << "No coins" << std::endl;

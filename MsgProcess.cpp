@@ -9,7 +9,7 @@ std::string MsgProcess::HelloAnswer(const std::string &bot_name, const std::stri
     return result_string;
 }
 
-void MsgProcess::GetParameters(const message_type &msg, game_parameters &parameters, MatchMode match_mode) {
+bool MsgProcess::GetParameters(const message_type &msg, game_parameters &parameters, MatchMode match_mode) {
     std::vector<std::string> words;
     boost::split(words, msg.data(), boost::is_any_of("\n "));
     if (match_mode == MatchMode::DEATHMATCH) {
@@ -35,14 +35,25 @@ void MsgProcess::GetParameters(const message_type &msg, game_parameters &paramet
                                  std::stoi(words[15]),
                                  std::stoi(words[17]));
     }
-
+    const size_t count_of_words = 20;
+    if (words.size() != count_of_words) {
+        return true;
+    }
+    return false;
 }
 
 std::pair<size_t, size_t> MsgProcess::GetData(const message_type &msg, size_t my_id, Algorithm &algorithm) {
     std::vector<std::string> cells;
     std::pair<size_t, size_t> my_pos;
     boost::split(cells, msg.data(), boost::is_any_of("\n"));
-    for (size_t i = 2; i + 1 < cells.size(); ++i) {
+
+    size_t update_index = 0;
+    const std::string update = "update";
+
+    while (cells[update_index] != update) {
+        ++update_index;
+    }
+    for (size_t i = update_index + 2; i + 1 < cells.size(); ++i) {
         std::vector<std::string> cur_data;
         boost::split(cur_data, cells[i], boost::is_any_of(" "));
         if (cur_data[0] == "bot" && std::stoi(cur_data[4]) == my_id) {
