@@ -45,15 +45,26 @@ bool MsgProcess::GetParameters(const message_type &msg, game_parameters &paramet
 std::pair<int, int> MsgProcess::GetData(const message_type &msg, size_t my_id, Algorithm &algorithm) {
     std::vector<std::string> cells;
     std::pair<int, int> no_info = {-1, -1};
+    std::pair<int, int> match_over = {-2, -2};
     std::pair<int, int> my_pos = no_info;
     boost::split(cells, msg.data(), boost::is_any_of("\n"));
 
     size_t update_index = 0;
     const std::string update = "update";
-
+    const std::string match_end = "match_over";
     while (update_index < cells.size() && cells[update_index] != update) {
         ++update_index;
     }
+
+    size_t match_end_index = 0;
+    while (match_end_index < cells.size() && cells[match_end_index] != match_end) {
+        ++match_end_index;
+    }
+
+    if (match_end_index < cells.size()) {
+        return match_over;
+    }
+
     for (size_t i = update_index + 2; i + 1 < cells.size(); ++i) {
         std::vector<std::string> cur_data;
         boost::split(cur_data, cells[i], boost::is_any_of(" "));

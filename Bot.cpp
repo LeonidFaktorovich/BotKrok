@@ -53,11 +53,15 @@ void Bot::StartSession(const char *ip, int port) {
         //auto start_data = std::chrono::steady_clock::now();
 
         std::pair<int, int> no_info = {-1, -1};
-
+        std::pair<int, int> match_end = {-2, -2};
         auto my_pos = MsgProcess::GetData(msg, my_id, *algorithm);
         if (my_pos == no_info) {
             --i;
             continue;
+        }
+        if (my_pos == match_end) {
+            std::cout << "Finish" << std::endl;
+            break;
         }
         //auto finish_data = std::chrono::steady_clock::now();
         //std::cout << std::chrono::duration_cast<std::chrono::microseconds>(finish_data - start_data).count() << " запись: ";
