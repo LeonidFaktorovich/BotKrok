@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string>
 
-using message_type = boost::array<char, 15000>;
+using message_type = boost::array<char, 30000>;
 
 class SocketSession
 {

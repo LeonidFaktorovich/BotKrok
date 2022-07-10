@@ -42,15 +42,16 @@ bool MsgProcess::GetParameters(const message_type &msg, game_parameters &paramet
     return false;
 }
 
-std::pair<size_t, size_t> MsgProcess::GetData(const message_type &msg, size_t my_id, Algorithm &algorithm) {
+std::pair<int, int> MsgProcess::GetData(const message_type &msg, size_t my_id, Algorithm &algorithm) {
     std::vector<std::string> cells;
-    std::pair<size_t, size_t> my_pos;
+    std::pair<int, int> no_info = {-1, -1};
+    std::pair<int, int> my_pos = no_info;
     boost::split(cells, msg.data(), boost::is_any_of("\n"));
 
     size_t update_index = 0;
     const std::string update = "update";
 
-    while (cells[update_index] != update) {
+    while (update_index < cells.size() && cells[update_index] != update) {
         ++update_index;
     }
     for (size_t i = update_index + 2; i + 1 < cells.size(); ++i) {
@@ -61,7 +62,9 @@ std::pair<size_t, size_t> MsgProcess::GetData(const message_type &msg, size_t my
             my_pos.second = std::stoi(cur_data[2]);
         }
     }
-    algorithm.SetEmptySquare(my_pos);
+    if (my_pos != no_info) {
+        algorithm.SetEmptySquare(my_pos);
+    }
     for (size_t i = 2; i + 1 < cells.size(); ++i) {
         std::vector<std::string> cur_data;
         boost::split(cur_data, cells[i], boost::is_any_of(" "));

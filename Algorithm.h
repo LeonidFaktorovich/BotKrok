@@ -4,7 +4,7 @@
 #include <vector>
 
 using pair = std::pair<int, int>;
-using message_type = boost::array<char, 15000>;
+using message_type = boost::array<char, 30000>;
 
 struct map_size {
     map_size() = default;
@@ -73,34 +73,39 @@ class Field
  public:
     Field(const map_size &size);
     Col &operator[](int x);
-    const map_size& GetSize() const;
-    size_t GetDistanceSquare(const std::pair<int, int>& point1, const std::pair<int, int>& point2) const;
+    const map_size &GetSize() const;
+    size_t GetDistanceSquare(const std::pair<int, int> &point1, const std::pair<int, int> &point2) const;
+
  private:
     std::vector<Col> table_;
     map_size table_size_;
 };
 
-class IteratorRectangle {
+class IteratorRectangle
+{
  public:
-    IteratorRectangle(Field& field, pair center, pair pos, int radius_width, int radius_height);
-    IteratorRectangle& operator++();
+    IteratorRectangle(Field &field, pair center, pair pos, int radius_width, int radius_height);
+    IteratorRectangle &operator++();
     pair operator*();
-    bool operator !=(const IteratorRectangle& end) const;
+    bool operator!=(const IteratorRectangle &end) const;
+
  private:
-    Field* field_;
+    Field *field_;
     pair pos;
     int radius_width;
     int radius_height;
     pair center;
 };
 
-class BigRectangle {
+class BigRectangle
+{
  public:
-    BigRectangle(Field& field, pair center, int radius_width, int radius_height);
+    BigRectangle(Field &field, pair center, int radius_width, int radius_height);
     IteratorRectangle begin();
     IteratorRectangle end();
+
  private:
-    Field* field_;
+    Field *field_;
     pair center;
     int radius_width;
     int radius_height;

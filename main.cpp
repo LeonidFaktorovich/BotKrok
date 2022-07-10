@@ -3,11 +3,7 @@
 #include <boost/asio.hpp>
 #include <iostream>
 #include <string>
-using namespace boost::asio;
-using ip::tcp;
-using std::cout;
-using std::endl;
-using std::string;
+
 int main() {
     /*
     boost::asio::io_context io_context;
@@ -61,7 +57,7 @@ int main() {
     const char ip[] = "127.0.0.1";
     int port = 2021;
     my_bot.StartSession(ip, port);
-
-
+    //localhost: 127.0.0.1, port 2021
+    //server: 178.216.99.141, port 2022
     return 0;
 }

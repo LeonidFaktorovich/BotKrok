@@ -1,4 +1,5 @@
 #include "Bot.h"
+#include <chrono>
 
 Bot::Bot(std::string bot_name, std::string bot_secret, MatchMode match_mode) : bot_name_(bot_name),
                                                                                  bot_secret_(bot_secret),
@@ -29,22 +30,37 @@ void Bot::StartSession(const char *ip, int port) {
     for (size_t i = 0; i < gameParameters.num_rounds; ++i) {
         message_type msg;
         std::cout << "Step " << i << std::endl;
+        //auto start_read = std::chrono::steady_clock::now();
+
         if (was_game_data) {
             msg = data_msg;
             was_game_data = false;
         } else {
             socket_session_->Read(msg);
+//            std::vector<std::string> lines;
+//            while (lines.empty() || lines[0] != "update") {
+//                lines.clear();
+//                socket_session_->Read(msg);
+//                boost::split(lines, msg.data(), boost::is_any_of("\n"));
+//            }
         }
-        //auto start_read = std::chrono::steady_clock::now();
 
+        //std::cout << msg.data() << std::endl;
 
         //auto finish_read = std::chrono::steady_clock::now();
-        //std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(finish_read - start_read).count() << " получение данных: ";
+        //std::cout << std::chrono::duration_cast<std::chrono::microseconds>(finish_read - start_read).count() << " получение данных: ";
 
         //auto start_data = std::chrono::steady_clock::now();
+
+        std::pair<int, int> no_info = {-1, -1};
+
         auto my_pos = MsgProcess::GetData(msg, my_id, *algorithm);
+        if (my_pos == no_info) {
+            --i;
+            continue;
+        }
         //auto finish_data = std::chrono::steady_clock::now();
-        //std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(finish_data - start_data).count() << " запись: ";
+        //std::cout << std::chrono::duration_cast<std::chrono::microseconds>(finish_data - start_data).count() << " запись: ";
         //auto start_write = std::chrono::steady_clock::now();
         auto [new_x, new_y] = algorithm->GetNextStep(my_pos, history_of_step_.back());
         int x_shift = static_cast<int>(new_x) - static_cast<int>(my_pos.first);
@@ -65,7 +81,7 @@ void Bot::StartSession(const char *ip, int port) {
         //auto finish_write = std::chrono::steady_clock::now();
 
 
-        //std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(finish_write - start_write).count() << std::endl;
+        //std::cout << std::chrono::duration_cast<std::chrono::microseconds>(finish_write - start_write).count() << std::endl;
     }
     message_type finish_msg;
     socket_session_->Read(finish_msg);

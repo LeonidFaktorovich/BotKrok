@@ -101,7 +101,7 @@ void Algorithm::SetEmptySquare(const pair &current_position) {
     }
      */
     //std::cout << (*BigRectangle(field_, current_position, radius, radius).begin()).first << ' ' << (*BigRectangle(field_, current_position, radius, radius).begin()).second << std::endl;
-    for (const auto& [x, y] : BigRectangle(field_, current_position, radius, radius)) {
+    for (const auto &[x, y] : BigRectangle(field_, current_position, radius, radius)) {
         if (field_.GetDistanceSquare(current_position, {x, y}) <= radius * radius) {
             field_[x][y] = Square(SquareType::Empty);
         }
@@ -137,7 +137,8 @@ pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, i
 
     int height = field_.GetSize().map_height;
     int width = field_.GetSize().map_width;
-    int radius = std::min(25, std::min(height, width) / 2);
+    const int SQUARE_WITH_COINS = 100;
+    int radius = std::min(SQUARE_WITH_COINS, std::min(height, width) / 2);
 
     int x_pos = static_cast<int>(current_position.first);
     int y_pos = static_cast<int>(current_position.second);
@@ -163,9 +164,9 @@ pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, i
         }
     }
      */
-    for (const auto& [x1, y1] : BigRectangle(field_, current_position, radius, radius)) {
+    for (const auto &[x1, y1] : BigRectangle(field_, current_position, radius, radius)) {
         if (field_[x1][y1].Type() == SquareType::Coin) {
-            for (const auto& [x2, y2] : BigRectangle(field_, current_position, radius, radius)) {
+            for (const auto &[x2, y2] : BigRectangle(field_, current_position, radius, radius)) {
                 if (field_.GetDistanceSquare({x1, y1}, {x2, y2}) <= params_.mining_radius * params_.mining_radius) {
                     has_coin_nearby.insert({x2, y2});
                 }
@@ -249,7 +250,8 @@ size_t Field::GetDistanceSquare(const std::pair<int, int> &point1, const std::pa
 }
 
 BigRectangle::BigRectangle(Field &field, pair center, int radius_width, int radius_height) : field_(&field),
-                                                                                             radius_width(radius_width), radius_height(radius_height) {
+                                                                                             radius_width(radius_width),
+                                                                                             radius_height(radius_height) {
     int x = (center.first % field_->GetSize().map_width + field_->GetSize().map_width) % field_->GetSize().map_width;
     int y = (center.second % field_->GetSize().map_height + field_->GetSize().map_height) % field_->GetSize().map_height;
     this->center.first = x;
@@ -264,14 +266,14 @@ IteratorRectangle BigRectangle::end() {
     return IteratorRectangle(*field_, center, {center.first + radius_width + 1, center.second - radius_height}, radius_width, radius_height);
 }
 
-IteratorRectangle::IteratorRectangle(Field &field, pair center, pair pos, int radius_width, int radius_height) :
-                                                                                                                 field_(&field),
+IteratorRectangle::IteratorRectangle(Field &field, pair center, pair pos, int radius_width, int radius_height) : field_(&field),
                                                                                                                  pos(std::move(pos)),
                                                                                                                  radius_width(radius_width),
-                                                                                                                 radius_height(radius_height), center(std::move(center)){
+                                                                                                                 radius_height(radius_height),
+                                                                                                                 center(std::move(center)) {
 }
 
-bool IteratorRectangle::operator!=(const IteratorRectangle& end) const {
+bool IteratorRectangle::operator!=(const IteratorRectangle &end) const {
     //int pos_x_cur = (pos.first % field_->GetSize().map_width + field_->GetSize().map_width) % field_->GetSize().map_width;
     //int pos_y_cur = (pos.second % field_->GetSize().map_height + field_->GetSize().map_height) % field_->GetSize().map_height;
     //int pos_x_end = (end.pos.first % end.field_->GetSize().map_width + end.field_->GetSize().map_width) % end.field_->GetSize().map_width;

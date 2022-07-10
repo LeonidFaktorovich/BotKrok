@@ -14,6 +14,7 @@ void SocketSession::Read(message_type &buf) {
     if (error && error != boost::asio::error::eof) {
         std::cerr << "receive failed: " << error.message() << std::endl;
     }
+    //std::cout << buf.data() << std::endl;
 }
 void SocketSession::Write(const std::string &buf) {
     boost::system::error_code error;
