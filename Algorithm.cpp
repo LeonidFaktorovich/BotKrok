@@ -5,6 +5,7 @@
 #include <queue>
 #include <unordered_map>
 #include <unordered_set>
+#include <iostream>
 
 map_size::map_size(int width, int height) {
     map_height = height;
@@ -78,29 +79,7 @@ void Algorithm::Set(int x, int y, Square new_square) {
 }
 
 void Algorithm::SetEmptySquare(const pair &current_position) {
-    /*
-    int width = field_.GetSize().map_width;
-    int height = field_.GetSize().map_height;
-     */
     int radius = params_.view_radius;
-    /*
-    int x_pos = static_cast<int>(current_position.first);
-    int y_pos = static_cast<int>(current_position.second);
-
-    int left_bord = (x_pos - radius) % width;
-    int right_bord = (x_pos + radius) % width;
-    int lower_bord = (y_pos - radius) % height;
-    int upper_bord = (y_pos + radius) % height;
-
-    for (int x = left_bord; x != right_bord; x = (x + 1) % width) {
-        for (int y = lower_bord; y != upper_bord; y = (y + 1) % height) {
-            if (field_.GetDistanceSquare(current_position, {x, y}) <= radius * radius) {
-                field_[x][y] = Square(SquareType::Empty);
-            }
-        }
-    }
-     */
-    //std::cout << (*BigRectangle(field_, current_position, radius, radius).begin()).first << ' ' << (*BigRectangle(field_, current_position, radius, radius).begin()).second << std::endl;
     for (const auto &[x, y] : BigRectangle(field_, current_position, radius, radius)) {
         if (field_.GetDistanceSquare(current_position, {x, y}) <= radius * radius) {
             field_[x][y] = Square(SquareType::Empty);
@@ -140,30 +119,7 @@ pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, i
     const int SQUARE_WITH_COINS = 100;
     int radius = std::min(SQUARE_WITH_COINS, std::min(height, width) / 2);
 
-    int x_pos = static_cast<int>(current_position.first);
-    int y_pos = static_cast<int>(current_position.second);
     std::unordered_set<pair, boost::hash<pair>> has_coin_nearby;
-    /*
-    int left_bord = (x_pos - radius) % width;
-    int right_bord = (x_pos + radius) % width;
-    int lower_bord = (y_pos - radius) % height;
-    int upper_bord = (y_pos + radius) % height;
-
-
-    for (int x1 = left_bord; x1 != right_bord; x1 = (x1 + 1) % width) {
-        for (int y1 = lower_bord; y1 != upper_bord; y1 = (y1 + 1) % height) {
-            if (field_[x1][y1].Type() == SquareType::Coin) {
-                for (int x2 = left_bord; x2 != right_bord; x2 = (x2 + 1) % width) {
-                    for (int y2 = lower_bord; y2 != upper_bord; y2 = (y2 + 1) % height) {
-                        if (field_.GetDistanceSquare({x1, y1}, {x2, y2}) <= std::pow(params_.mining_radius, 2)) {
-                            has_coin_nearby.insert({(x2 + width) % width, (y2 + height) % height});
-                        }
-                    }
-                }
-            }
-        }
-    }
-     */
     for (const auto &[x1, y1] : BigRectangle(field_, current_position, radius, radius)) {
         if (field_[x1][y1].Type() == SquareType::Coin) {
             for (const auto &[x2, y2] : BigRectangle(field_, current_position, radius, radius)) {
@@ -179,7 +135,7 @@ pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, i
     q.push(current_position);
 
     std::vector<std::pair<int, int>> neighbours{{-1, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}};
-
+    pair no_target = {-1, -1};
     while (!q.empty()) {
         auto now = q.front();
         q.pop();
@@ -195,37 +151,33 @@ pair Algorithm::GetNextStep(const pair &current_position, const std::pair<int, i
                     while (prev.at(next) != current_position) {
                         next = prev.at(next);
                     }
+                    block_target_ = no_target;
                     return next;
                 }
             }
         }
     }
 
-    // if no coins are found
-    //boost::range::random_shuffle(neighbours);
-
-    size_t last_step_ind = 0;
-    while (neighbours[last_step_ind] != last_step) {
-        ++last_step_ind;
-    }
-    bool only_back = false;
-    for (size_t index = last_step_ind;; index = (index + 1) % neighbours.size()) {
-        if (index == (last_step_ind + 4) % neighbours.size()) {
-            if (only_back) {
-                return {(static_cast<int>(current_position.first + width) + neighbours[(last_step_ind + 4) % neighbours.size()].first) % width,
-                        (static_cast<int>(current_position.second + height) + neighbours[(last_step_ind + 4) % neighbours.size()].second) % height};
-            }
-            only_back = true;
-            continue;
-        }
-        //std::cout << "No coins" << std::endl;
-        pair next = {(static_cast<int>(current_position.first + width) + neighbours[index].first) % width,
-                     (static_cast<int>(current_position.second + height) + neighbours[index].second) % height};
-        //std::cout << next.first << ' ' << next.second << std::endl;
-        if (field_[next.first][next.second].Type() != SquareType::Block) {
-            return next;
+    pair no_result = {-1, -1};
+    auto nearest_coin = GetNearestCoin(current_position);
+    if (nearest_coin != no_result) {
+        auto next_step = GoToSquare(current_position, nearest_coin);
+        if (next_step != no_result) {
+            block_target_ = no_target;
+            return next_step;
         }
     }
+    if (block_target_ == no_target || block_target_ == current_position) {
+        block_target_ = GetNearestNoneBlock(current_position);
+    }
+    if (block_target_ != no_result) {
+        auto next_step = GoToSquare(current_position, block_target_);
+        if (next_step != no_result) {
+            //std::cout << block_target_.first << ' ' << block_target_.second << std::endl;
+            return next_step;
+        }
+    }
+    return GetRandomSquare(current_position, last_step);
     /*
     for (const auto &neigh : neighbours) {
         std::cout << "No coins" << std::endl;
@@ -274,10 +226,6 @@ IteratorRectangle::IteratorRectangle(Field &field, pair center, pair pos, int ra
 }
 
 bool IteratorRectangle::operator!=(const IteratorRectangle &end) const {
-    //int pos_x_cur = (pos.first % field_->GetSize().map_width + field_->GetSize().map_width) % field_->GetSize().map_width;
-    //int pos_y_cur = (pos.second % field_->GetSize().map_height + field_->GetSize().map_height) % field_->GetSize().map_height;
-    //int pos_x_end = (end.pos.first % end.field_->GetSize().map_width + end.field_->GetSize().map_width) % end.field_->GetSize().map_width;
-    //int pos_y_end = (end.pos.second % end.field_->GetSize().map_height + end.field_->GetSize().map_height) % end.field_->GetSize().map_height;
     return std::tie(field_, pos.first, pos.second) != std::tie(end.field_, end.pos.first, end.pos.second);
 }
 
@@ -295,4 +243,114 @@ pair IteratorRectangle::operator*() {
     int x = (pos.first % field_->GetSize().map_width + field_->GetSize().map_width) % field_->GetSize().map_width;
     int y = (pos.second % field_->GetSize().map_height + field_->GetSize().map_height) % field_->GetSize().map_height;
     return {x, y};
+}
+
+pair Algorithm::GoToSquare(const pair &current_position, const pair &finish) {
+    std::unordered_map<pair, pair, boost::hash<pair>> prev;
+    pair no_way = {-1, -1};
+    std::queue<pair> q;
+    q.push(current_position);
+
+    std::vector<std::pair<int, int>> neighbours{{-1, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}};
+    int height = field_.GetSize().map_height;
+    int width = field_.GetSize().map_width;
+    while (!q.empty()) {
+        auto now = q.front();
+        q.pop();
+        for (const auto &neigh : neighbours) {
+            pair next = {(now.first + width + neigh.first) % width,
+                         (now.second + height + neigh.second) % height};
+
+            const auto &type = field_[next.first][next.second].Type();
+            if (!prev.contains(next) && (type == SquareType::Empty || type == SquareType::Coin || type == SquareType::None)) {
+                prev[next] = now;
+                q.push(next);
+            }
+        }
+    }
+    if (!prev.contains(finish)) {
+        return no_way;
+    }
+    pair last = finish;
+    while (prev.at(last) != current_position) {
+        last = prev.at(last);
+    }
+    return last;
+}
+
+pair Algorithm::GetNearestCoin(const pair &current_position) {
+    pair no_coins = {-1, -1};
+    pair nearest_coin = no_coins;
+    size_t min_distance_square = field_.GetDistanceSquare(current_position, no_coins);
+
+    for (size_t x = 0; x < field_.GetSize().map_width; ++x) {
+        for (size_t y = 0; y < field_.GetSize().map_height; ++y) {
+            if (field_[x][y].Type() == SquareType::Coin &&
+                (nearest_coin == no_coins || field_.GetDistanceSquare(current_position, {x, y}) < min_distance_square)) {
+                min_distance_square = field_.GetDistanceSquare(current_position, {x, y});
+                nearest_coin = {x, y};
+            }
+        }
+    }
+    return nearest_coin;
+}
+
+//need fix
+
+pair Algorithm::GetNearestNoneBlock(const pair &current_position) {
+    std::unordered_set<pair, boost::hash<std::pair<int, int>>> centers;
+    std::queue<pair> q;
+    pair no_block = {-1, -1};
+    std::vector<std::pair<int, int>> neighbours{{-1, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}};
+    const int area_length = 30;
+    int current_width = field_.GetSize().map_width - (field_.GetSize().map_width % area_length);
+    int current_height = field_.GetSize().map_height - (field_.GetSize().map_height % area_length);
+    int new_my_x = (current_position.first >= current_width) ? (current_width - 1) : (current_position.first);
+    int new_my_y = (current_position.second >= current_height) ? (current_height - 1) : (current_position.second);
+    int center_x = (new_my_x / area_length) * area_length + area_length / 2;
+    int center_y = (new_my_y / area_length) * area_length + area_length / 2;
+    q.push({center_x, center_y});
+    while (!q.empty()) {
+        auto [cur_x, cur_y] = q.front();
+        q.pop();
+        for (const auto& [x, y] : neighbours) {
+            int new_x = ((cur_x + area_length * x) % current_width + current_width) % current_width;
+            int new_y = ((cur_y + area_length * y) % current_height + current_height) % current_height;
+            pair next = {new_x, new_y};
+            if (field_[new_x][new_y].Type() == SquareType::None) {
+                return next;
+            }
+            if (!centers.contains(next)) {
+                q.push(next);
+                centers.insert(next);
+            }
+        }
+    }
+    return no_block;
+}
+
+pair Algorithm::GetRandomSquare(const pair &current_position, const pair &last_step) {
+    std::vector<std::pair<int, int>> neighbours{{-1, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}};
+    int width = field_.GetSize().map_width;
+    int height = field_.GetSize().map_height;
+    size_t last_step_ind = 0;
+    while (neighbours[last_step_ind] != last_step) {
+        ++last_step_ind;
+    }
+    bool only_back = false;
+    for (size_t index = last_step_ind;; index = (index + 1) % neighbours.size()) {
+        if (index == (last_step_ind + 4) % neighbours.size()) {
+            if (only_back) {
+                return {(static_cast<int>(current_position.first + width) + neighbours[(last_step_ind + 4) % neighbours.size()].first) % width,
+                        (static_cast<int>(current_position.second + height) + neighbours[(last_step_ind + 4) % neighbours.size()].second) % height};
+            }
+            only_back = true;
+            continue;
+        }
+        pair next = {(static_cast<int>(current_position.first + width) + neighbours[index].first) % width,
+                     (static_cast<int>(current_position.second + height) + neighbours[index].second) % height};
+        if (field_[next.first][next.second].Type() != SquareType::Block) {
+            return next;
+        }
+    }
 }

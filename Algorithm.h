@@ -116,10 +116,14 @@ class Algorithm
  public:
     Algorithm(const game_parameters &params);
     void Set(int x, int y, Square new_square);
-    pair GetNextStep(const pair &current_position, const std::pair<int, int> &last_step);
+    pair GetNextStep(const pair &current_position, const pair &last_step);
     void SetEmptySquare(const pair &current_position);
-
+    pair GoToSquare (const pair& current_position, const pair& finish);
+    pair GetNearestCoin (const pair& current_position);
+    pair GetNearestNoneBlock (const pair& current_position);
+    pair GetRandomSquare (const pair& current_position, const pair& last_step);
  private:
     game_parameters params_;
     Field field_;
+    pair block_target_ = {-1, -1};
 };
