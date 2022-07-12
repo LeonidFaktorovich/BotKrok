@@ -66,7 +66,7 @@ void Bot::StartSession(const char *ip, int port) {
         //auto finish_data = std::chrono::steady_clock::now();
         //std::cout << std::chrono::duration_cast<std::chrono::microseconds>(finish_data - start_data).count() << " запись: ";
         //auto start_write = std::chrono::steady_clock::now();
-        auto [new_x, new_y] = algorithm->GetNextStep(my_pos, history_of_step_.back());
+        auto [new_x, new_y] = algorithm->GetNextStep(history_of_step_.back());
         int x_shift = static_cast<int>(new_x) - static_cast<int>(my_pos.first);
         if (x_shift == static_cast<int>(gameParameters.map.map_width) - 1) {
             x_shift = -1;

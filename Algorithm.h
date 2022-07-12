@@ -116,14 +116,18 @@ class Algorithm
  public:
     Algorithm(const game_parameters &params);
     void Set(int x, int y, Square new_square);
-    pair GetNextStep(const pair &current_position, const pair &last_step);
-    void SetEmptySquare(const pair &current_position);
-    pair GoToSquare (const pair& current_position, const pair& finish);
-    pair GetNearestCoin (const pair& current_position);
-    pair GetNearestNoneBlock (const pair& current_position);
-    pair GetRandomSquare (const pair& current_position, const pair& last_step);
+    pair GetNextStep(const pair &last_step);
+    void SetEmptySquare();
+    pair GoToSquare (const pair& finish);
+    pair GetNearestCoin ();
+    pair GetNearestNoneBlock ();
+    pair GetRandomSquare (const pair& last_step);
+    void SetMyPosition (const pair& current_position);
+    void SetMyCoins (int coins);
  private:
     game_parameters params_;
     Field field_;
     pair block_target_ = {-1, -1};
+    pair my_position_;
+    int my_coins_ = 0;
 };

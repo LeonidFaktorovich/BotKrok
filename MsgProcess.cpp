@@ -74,13 +74,15 @@ std::pair<int, int> MsgProcess::GetData(const message_type &msg, size_t my_id, A
             try {
                 my_pos.first = std::stoi(cur_data[1]);
                 my_pos.second = std::stoi(cur_data[2]);
+                algorithm.SetMyPosition(my_pos);
+                algorithm.SetMyCoins(std::stoi(cur_data[3]));
             } catch (const std::exception& e) {
                 continue;
             }
         }
     }
     if (my_pos != no_info) {
-        algorithm.SetEmptySquare(my_pos);
+        algorithm.SetEmptySquare();
     }
     for (size_t i = 2; i + 1 < cells.size(); ++i) {
         try {
